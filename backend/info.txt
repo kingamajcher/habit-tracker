@@ -1,0 +1,2 @@
+odpalanie servera: npm run dev
+opalanie bazy danych: sudo systemctl start mongod
