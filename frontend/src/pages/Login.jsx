@@ -9,7 +9,6 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Próba logowania...', { identifier, password });
     try {
       const res = await API.post('/api/users/login', { identifier, password });
       localStorage.setItem('token', res.data.token);

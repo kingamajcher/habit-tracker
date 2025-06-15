@@ -6,8 +6,7 @@ const ALLOWED_STATUSES = ['done', 'not done'];
 
 // Tworzenie logu nawyku
 const createHabitLog = async (req, res) => {
-  const { habitId } = req.body;
-  const status = req.body.status || 'not done';
+  const { habitId, status = 'not done', date } = req.body;
 
   if (!habitId) {
     return res.status(400).json({ message: 'Brak habitId' });
@@ -21,6 +20,12 @@ const createHabitLog = async (req, res) => {
     return res.status(400).json({ message: `Nieprawidłowy status. Dozwolone: ${ALLOWED_STATUSES.join(', ')}` });
   }
 
+  let logDate = date ? new Date(date) : new Date();
+
+  if (isNaN(logDate.getTime())) {
+    return res.status(400).json({ message: 'Nieprawidłowy format daty' });
+  }
+
   try {
     const habit = await Habit.findById(habitId);
     if (!habit) return res.status(404).json({ message: 'Nawyk nie znaleziony' });
@@ -29,10 +34,16 @@ const createHabitLog = async (req, res) => {
       return res.status(403).json({ message: 'Brak uprawnień' });
     }
 
-    const log = new HabitLog({ habit: habitId, status });
+    const log = new HabitLog({
+      habit: habitId,
+      date,
+      status,
+    });
+
     await log.save();
     res.status(201).json({ message: 'Log nawyku utworzony', log });
   } catch (error) {
+    console.error('Błąd przy tworzeniu logu:', error);
     res.status(500).json({ message: 'Błąd serwera' });
   }
 };

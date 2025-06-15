@@ -2,26 +2,34 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api/axios';
 
-export default function HabitList() {
+export default function HabitList({ searchTerm = '' }) {
   const [habits, setHabits] = useState([]);
 
   useEffect(() => {
     const fetchHabits = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await API.get('/api/habits', {
+
+        const params = new URLSearchParams();
+        if (searchTerm.trim() !== '') {
+          params.append('name', searchTerm.trim());
+        }
+
+        const res = await API.get('/api/habits?' + params.toString(), {
           headers: { Authorization: `Bearer ${token}` }
         });
+
         setHabits(res.data.habits);
       } catch (err) {
         console.error('Błąd przy pobieraniu nawyków:', err);
       }
     };
+
     fetchHabits();
-  }, []);
+  }, [searchTerm]);
 
   return (
-    <ul>
+    <ul style={{ listStyleType: 'none', padding: 0 }}>
       {habits.map(habit => (
         <li key={habit._id}>
           <Link to={`/habits/${habit._id}`}>

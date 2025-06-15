@@ -31,11 +31,6 @@ export default function Profile() {
       });
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   if (!user) {
     return <p>Ładowanie profilu...</p>;
   }
@@ -45,9 +40,6 @@ export default function Profile() {
       <h2 className="text-2xl font-bold mb-4">Profil użytkownika</h2>
       <p><strong>Nazwa użytkownika:</strong> {user.username}</p>
       <p><strong>Email:</strong> {user.email}</p>
-      <button onClick={handleLogout} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
-        Wyloguj się
-      </button>
     </div>
   );
 }
