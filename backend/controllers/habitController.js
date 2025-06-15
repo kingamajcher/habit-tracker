@@ -29,6 +29,28 @@ const createHabit = async (req, res) => {
   }
 };
 
+// Pobieranie jednego nawyku po ID
+const getHabitById = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Nieprawidłowy format ID' });
+  }
+
+  try {
+    const habit = await Habit.findOne({ _id: id, owner: req.user.id });
+
+    if (!habit) {
+      return res.status(404).json({ message: 'Nawyk nie znaleziony' });
+    }
+
+    res.json(habit);
+  } catch (error) {
+    console.error('Błąd przy pobieraniu nawyku:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+};
+
 
 // Pobieranie wszystkich nawyków użytkownika (z filtrowaniem i paginacją)
 const getHabits = async (req, res) => {
@@ -139,4 +161,4 @@ const deleteHabit = async (req, res) => {
 };
 
 
-module.exports = { createHabit, getHabits, updateHabit, deleteHabit };
+module.exports = { createHabit, getHabitById, getHabits, updateHabit, deleteHabit };

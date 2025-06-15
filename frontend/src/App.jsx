@@ -7,6 +7,8 @@ import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import RequireAuth from './auth/RequireAuth';
 import Home from './pages/Home';
+import AddHabit from './pages/AddHabit';
+import HabitDetails from './pages/HabitDetails';
 
 function App() {
   return (
@@ -21,6 +23,16 @@ function App() {
         <Route path="/profile" element={
           <RequireAuth>
             <Profile />
+          </RequireAuth>
+        } />
+        <Route path="/add-habit" element={
+          <RequireAuth>
+            <AddHabit />
+          </RequireAuth>
+        } />
+        <Route path="/habits/:id" element={
+          <RequireAuth>
+            <HabitDetails />
           </RequireAuth>
         } />
         <Route path="/login" element={<Login />} />

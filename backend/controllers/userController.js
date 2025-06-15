@@ -32,28 +32,46 @@ const registerUser = async (req, res) => {
 
 // Logowanie użytkownika
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { identifier, password } = req.body;
+
+  if (!identifier || !password) {
+    return res.status(400).json({ message: 'Brakuje danych logowania' });
+  }
+
   try {
-    const user = await User.findOne({ email });
+    // Szukaj użytkownika po emailu lub nazwie użytkownika
+    const user = await User.findOne({
+      $or: [
+        { email: identifier.toLowerCase() },
+        { username: identifier }
+      ],
+    });
+
     if (!user) {
-      return res.status(400).json({ message: 'Nieprawidłowy email lub hasło' });
+      return res.status(400).json({ message: 'Nieprawidłowy email/nazwa użytkownika lub hasło' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Nieprawidłowy email lub hasło' });
+      return res.status(400).json({ message: 'Nieprawidłowy email/nazwa użytkownika lub hasło' });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-      algorithm: 'HS256',
-    });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+        algorithm: 'HS256',
+      }
+    );
 
-    res.json({ token, message: 'Zalogowano pomyślnie' });
+    res.status(200).json({ token, message: 'Zalogowano pomyślnie' });
   } catch (error) {
+    console.error('Błąd logowania:', error);
     res.status(500).json({ message: 'Błąd serwera' });
   }
 };
+
 
 // Pobieranie danych o użytkowniku
 const getUserProfile = async (req, res) => {
@@ -77,8 +95,8 @@ const getAllUsers = async (req, res) => {
 
 // Zwraca dane zalogowanego użytkownika
 const getMe = (req, res) => {
-  const { _id, name, email } = req.user;
-  res.json({ id: _id, name, email });
+  const { _id, username, email } = req.user;
+  res.json({ id: _id, username, email });
 };
 
 

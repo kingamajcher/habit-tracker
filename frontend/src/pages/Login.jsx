@@ -3,17 +3,17 @@ import API from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Próba logowania...', { email, password });
+    console.log('Próba logowania...', { identifier, password });
     try {
-      const res = await API.post('/api/users/login', { email, password });
+      const res = await API.post('/api/users/login', { identifier, password });
       localStorage.setItem('token', res.data.token);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       alert(err.response.data.message || 'Błąd logowania');
     }
@@ -22,7 +22,7 @@ export default function Login() {
   return (
     <form onSubmit={handleLogin}>
       <h2>Logowanie</h2>
-      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+      <input type="identifier" placeholder="Login lub email" value={identifier} onChange={e => setIdentifier(e.target.value)} required />
       <input type="password" placeholder="Hasło" value={password} onChange={e => setPassword(e.target.value)} required />
       <button type="submit" onClick={handleLogin}>Zaloguj się</button>
 
